@@ -52,5 +52,6 @@ for p in paragraphs:
 games_df = pd.DataFrame({'Home':all_games[:,0],'Away':all_games[:,1]})
 games_df_updated = games_df.applymap(str).applymap(switch_team_name)
 
-
+teams = list(games_df_updated.Home.unique())
+teams.sort()
         
