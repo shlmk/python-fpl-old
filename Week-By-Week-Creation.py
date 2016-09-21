@@ -10,6 +10,22 @@ import requests
 import numpy as np
 import pandas as pd
 
+
+def switch_team_name(team):
+    return{
+        'AFC Bournemouth': 'Bournemouth',
+        'Hull City': 'Hull',
+        'Leicester City': 'Leicester',
+        'Manchester City': 'Man City',
+        'Manchester United': 'Man United',
+        'Stoke City': 'Stoke',
+        'Swansea City': 'Swansea', 
+        'Tottenham Hotspur': 'Spurs',
+        'West Bromwich Albion': 'West Brom',
+        'West Ham United': 'West Ham'
+    }.get(team, team)
+    
+    
 r = requests.get('http://www.espnfc.us/english-premier-league/story/'+
                      '2890569/premier-league-fixtures-2016-17')
                      
@@ -31,4 +47,10 @@ for p in paragraphs:
             all_games[count][1] = teams[1].replace('\n', '')
             count += 1
 
+
+
 games_df = pd.DataFrame({'Home':all_games[:,0],'Away':all_games[:,1]})
+games_df_updated = games_df.applymap(str).applymap(switch_team_name)
+
+
+        
