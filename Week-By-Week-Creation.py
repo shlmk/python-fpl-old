@@ -70,6 +70,14 @@ for team in teams:
     all_schedules[team] = np.array(opponents)
     
 all_schedules_df = pd.DataFrame.from_dict(all_schedules, orient='index')
+all_schedules_df = all_schedules_df.sort_index()
 all_schedules_df.columns = ['Week ' + str(i) for i in range(1, 39)]
+
+writer = pd.ExcelWriter('Premier-League_2016-2017_WeekByWeek.xlsx')
+row = 0
+for i in range (3):
+    all_schedules_df.to_excel(writer,sheet_name='Schedule',startrow=row , startcol=0)   
+    row = row + len(all_schedules_df.index) + 2
+writer.save()
 
         
