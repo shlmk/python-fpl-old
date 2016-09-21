@@ -30,4 +30,5 @@ for p in paragraphs:
             all_games[count][0] = teams[0].replace('\n', '')
             all_games[count][1] = teams[1].replace('\n', '')
             count += 1
-        
+
+games_df = pd.DataFrame({'Home':all_games[:,0],'Away':all_games[:,1]})
