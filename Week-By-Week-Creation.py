@@ -25,7 +25,15 @@ def switch_team_name(team):
         'West Ham United': 'West Ham'
     }.get(team, team)
     
-    
+def getOpponent(week, team):
+    if(week.Home == team):
+        return week.Away + ' (H)'
+    else:
+        return week.Home + ' (A)'
+
+def getTeamSchedule(all_weeks, team):
+    return all_weeks[(all_weeks.Home == team) | (all_weeks.Away == team)] 
+      
 r = requests.get('http://www.espnfc.us/english-premier-league/story/'+
                      '2890569/premier-league-fixtures-2016-17')
                      
@@ -54,4 +62,14 @@ games_df_updated = games_df.applymap(str).applymap(switch_team_name)
 
 teams = list(games_df_updated.Home.unique())
 teams.sort()
+
+all_schedules = {}
+for team in teams: 
+    team_schedule = getTeamSchedule(games_df_updated, team)
+    opponents = team_schedule.apply(lambda week: getOpponent(week, team), 1)
+    all_schedules[team] = np.array(opponents)
+    
+all_schedules_df = pd.DataFrame.from_dict(all_schedules, orient='index')
+all_schedules_df.columns = ['Week ' + str(i) for i in range(1, 39)]
+
         
