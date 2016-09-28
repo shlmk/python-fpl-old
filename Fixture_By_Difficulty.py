@@ -11,6 +11,20 @@ import numpy as np
 import pandas as pd
 import ast
 
+def switch_team_name(team):
+    return{
+        'AFC Bournemouth': 'Bournemouth',
+        'Hull City': 'Hull',
+        'Leicester City': 'Leicester',
+        'Manchester City': 'Man City',
+        'Manchester United': 'Man United',
+        'Stoke City': 'Stoke',
+        'Swansea City': 'Swansea', 
+        'Tottenham Hotspur': 'Spurs',
+        'West Bromwich Albion': 'West Brom',
+        'West Ham United': 'West Ham'
+    }.get(team, team)
+    
 def extract_ratings(fixtures, team_num):
     print(len(fixtures))
     diffculty = []
@@ -59,7 +73,19 @@ for team_num in range(1, 21):
     
 all_schedules_df = pd.DataFrame.from_dict(diff_by_team, orient='index')
 all_schedules_df.columns = ['Week ' + str(i) for i in range(1, 39)]
+r = requests.get('https://fantasy.premierleague.com/a/team/my')
+soup = BeautifulSoup(r.text)
+
+teams_html = soup.findAll("span", { "class" : "name" })
+
+teams = []
+
+for team in teams_html:
+    teams.append(team.contents[0])
+teams.sort()
+
+teams = list(map(switch_team_name, teams))
+all_schedules_df.index = teams
 
 
 
-    
