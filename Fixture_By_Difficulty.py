@@ -10,6 +10,7 @@ import requests
 import numpy as np
 import pandas as pd
 import ast
+from openpyxl import load_workbook
 
 def switch_team_name(team):
     return{
@@ -87,5 +88,10 @@ teams.sort()
 teams = list(map(switch_team_name, teams))
 all_schedules_df.index = teams
 
-
+writer = pd.ExcelWriter('Premier-League_2016-2017_WeekByWeek.xlsx')
+row = 0
+for i in range (3):
+    all_schedules_df.to_excel(writer,sheet_name='Difficulty',startrow=row , startcol=0)   
+    row = row + len(all_schedules_df.index) + 2
+writer.save()
 
