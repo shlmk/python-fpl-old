@@ -21,6 +21,22 @@ teams = ['Arsenal','Bournemouth','Burnley',
          'Spurs','Stoke','Sunderland','Swansea',
          'Watford','West Brom','West Ham']
          
+#NOTE: weeks must be a list format
+def record_data(weeks):
+    if type(weeks) is not list:
+        raise TypeError('Weeks must be of type list')
+    else:
+        for week in weeks:
+            if type(week) is not int:
+                raise TypeError('Week must be an int value')
+            elif week < 1 or week > 38:
+                raise IndexError('Week must be between 1 and 38')
+            else:
+                process_week(week)
+                
+def process_week(week):
+    
+        
 def process_row(row):
     print("DOES NOTHING!")
 
