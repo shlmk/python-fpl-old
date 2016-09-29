@@ -25,38 +25,39 @@ def switch_team_name(team):
         'West Bromwich Albion': 'West Brom',
         'West Ham United': 'West Ham'
     }.get(team, team)
+
+def get_pl_teams():
+    r = requests.get('https://fantasy.premierleague.com/a/team/my')
+    soup = BeautifulSoup(r.text)
+    teams_html = soup.findAll("span", { "class" : "name" })
+    teams = []
     
+    for team in teams_html:
+        teams.append(team.contents[0])
+    teams.sort()
+    
+    return(list(map(switch_team_name, teams)))
+      
 def extract_ratings(fixtures, team_num):
-    print(len(fixtures))
     diffculty = []
-    count = 0
     for fix in fixtures: 
         if(fix['team_h'] == team_num):
             diffculty.append(fix['team_h_difficulty'])
-            print("YAS")
-            count += 1
-            print(count)
         elif(fix['team_a'] == team_num):
             diffculty.append(fix['team_a_difficulty'])
-            print("YAS2")
-            count += 1
-            print(count)
     return diffculty
     
 r = requests.get('https://fantasy.premierleague.com/drf/fixtures/')
-                     
 soup = BeautifulSoup(r.text)
-
 paragraph = soup.find("p")
 
 str_fix_list = paragraph.contents
 
-#Do some cleaning
+#Do some cleaning to the data 
 fix_str = str_fix_list[0][1:-1]
 fix_str = fix_str.replace(',{\"id\":','SPLIT{\"id\":')
 
 fixture_list = fix_str.split('SPLIT')
-
 fixture_list_corr = []
 
 for idx, fix in enumerate(fixture_list):
@@ -74,21 +75,17 @@ for team_num in range(1, 21):
     
 all_schedules_df = pd.DataFrame.from_dict(diff_by_team, orient='index')
 all_schedules_df.columns = ['Week ' + str(i) for i in range(1, 39)]
-r = requests.get('https://fantasy.premierleague.com/a/team/my')
-soup = BeautifulSoup(r.text)
+all_schedules_df.index = get_pl_teams()
 
-teams_html = soup.findAll("span", { "class" : "name" })
+#Used to actually write to current spreadsheet
+#From: https://stackoverflow.com/questions/20219254/how-to-write-to-an-existing-excel-file-without-overwriting-data-using-pandas
 
-teams = []
+book = load_workbook('Premier-League_2016-2017_WeekByWeek.xlsx')
 
-for team in teams_html:
-    teams.append(team.contents[0])
-teams.sort()
+writer = pd.ExcelWriter('Premier-League_2016-2017_WeekByWeek.xlsx',engine='openpyxl')
+writer.book = book
+writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
 
-teams = list(map(switch_team_name, teams))
-all_schedules_df.index = teams
-
-writer = pd.ExcelWriter('Premier-League_2016-2017_WeekByWeek.xlsx')
 row = 0
 for i in range (3):
     all_schedules_df.to_excel(writer,sheet_name='Difficulty',startrow=row , startcol=0)   
