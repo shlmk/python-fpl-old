@@ -12,6 +12,9 @@ import pandas as pd
 import ast
 from openpyxl import load_workbook
 
+
+#TODO: CLEAN UP CODE AND REFACTOR IT!
+
 def switch_team_name(team):
     return{
         'AFC Bournemouth': 'Bournemouth',
