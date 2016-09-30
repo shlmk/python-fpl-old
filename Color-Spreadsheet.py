@@ -15,14 +15,6 @@ from openpyxl import load_workbook
 import ast
 from functools import reduce
 
-#TODO: Make better placement of this
-teams = ['Arsenal','Bournemouth','Burnley',
-         'Chelsea', 'Crystal Palace', 'Everton',
-         'Hull','Leicester','Liverpool','Man City',
-         'Man United','Middlesbrough','Southampton',
-         'Spurs','Stoke','Sunderland','Swansea',
-         'Watford','West Brom','West Ham']
-
 #COLORS
 RED = 'FF0000'
 GREEN = '00B050'
@@ -30,16 +22,66 @@ TAN = 'F8CBAD'
 YELLOW = 'FFFF00'
 ORANGE = 'FFC000'
 
-
 wb = load_workbook('Premier-League_2016-2017_WeekByWeek.xlsx')
-sheet_schedule = wb['Schedule']
-sheet_difficulty = wb['Difficulty']
-
-
+sh_sch = wb['Schedule']
+sh_diff = wb['Difficulty']
 
 def color_spreadsheet(week_num, team_h, h_score, team_a, a_score):
-    print("Week " + str(week_num) + ": " + str(team_h) +  " " + str(h_score) + 
-           " - " + str(a_score) + " " + str(team_a))
+    
+    #Check game result
+    if h_score == a_score: 
+        home_color = PatternFill("solid", fgColor=TAN)
+        away_color = PatternFill("solid", fgColor=TAN)
+    elif h_score > a_score:
+        home_color = PatternFill("solid", fgColor=GREEN)
+        away_color = PatternFill("solid", fgColor=RED)
+    else:
+        home_color = PatternFill("solid", fgColor=RED)
+        away_color = PatternFill("solid", fgColor=GREEN)
+
+    sh_sch.cell(row=team_h + 1, column=week_num + 1).fill = home_color
+    sh_sch.cell(row=team_a + 1, column=week_num + 1).fill = away_color
+    sh_diff.cell(row=team_h + 1, column=week_num + 1).fill = home_color
+    sh_diff.cell(row=team_a + 1, column=week_num + 1).fill = away_color
+    
+    #Check actual scores (home score)
+    if h_score == 0:
+        home_off_color = PatternFill("solid", fgColor=RED)
+        away_def_color = PatternFill("solid", fgColor=GREEN)
+    elif h_score == 1:
+        home_off_color = PatternFill("solid", fgColor=ORANGE)
+        away_def_color = PatternFill("solid", fgColor=YELLOW)
+    elif h_score == 2:
+        home_off_color = PatternFill("solid", fgColor=YELLOW)
+        away_def_color = PatternFill("solid", fgColor=ORANGE)
+    else:
+        home_off_color = PatternFill("solid", fgColor=GREEN)
+        away_def_color = PatternFill("solid", fgColor=RED)
+    
+    sh_sch.cell(row=team_h + 45, column=week_num + 1).fill = home_off_color
+    sh_sch.cell(row=team_a + 23, column=week_num + 1).fill = away_def_color
+    sh_diff.cell(row=team_h + 45, column=week_num + 1).fill = home_off_color
+    sh_diff.cell(row=team_a + 23, column=week_num + 1).fill = away_def_color
+   
+   #Check actual scores (away score)
+    if a_score == 0:
+        home_off_color = PatternFill("solid", fgColor=GREEN)
+        away_def_color = PatternFill("solid", fgColor=RED)
+    elif a_score == 1:
+        home_off_color = PatternFill("solid", fgColor=YELLOW)
+        away_def_color = PatternFill("solid", fgColor=ORANGE)
+    elif a_score == 2:
+        home_off_color = PatternFill("solid", fgColor=ORANGE)
+        away_def_color = PatternFill("solid", fgColor=YELLOW)
+    else:
+        home_off_color = PatternFill("solid", fgColor=RED)
+        away_def_color = PatternFill("solid", fgColor=GREEN)
+    
+    sh_sch.cell(row=team_h + 23, column=week_num + 1).fill = home_off_color
+    sh_sch.cell(row=team_a + 45, column=week_num + 1).fill = away_def_color
+    sh_diff.cell(row=team_h + 23, column=week_num + 1).fill = home_off_color
+    sh_diff.cell(row=team_a + 45, column=week_num + 1).fill = away_def_color
+       
        
 def process_week(week_html, week_num):
     week = week_html.text
@@ -52,10 +94,12 @@ def process_week(week_html, week_num):
     for game in week: 
         color_spreadsheet(week_num, game['team_h'], game['team_h_score'], 
                           game['team_a'], game['team_a_score'])
+                          
+    wb.save('Premier-League_2016-2017_WeekByWeek.xlsx')
             
 #NOTE: weeks must be a list format
 def record_data(weeks):
-    url = 'https://fantasy.premierleague.com/drf/fixtures/?event='
+    base_url = 'https://fantasy.premierleague.com/drf/fixtures/?event='
 
     if type(weeks) is not list:
         raise TypeError('Weeks must be of type list')
@@ -66,9 +110,8 @@ def record_data(weeks):
             elif week_num < 1 or week_num > 38:
                 raise IndexError('Week must be between 1 and 38')
             else: 
-                url += str(week_num)
+                url = base_url + str(week_num)
         
-            print(url)
             r = requests.get(url)
             soup = BeautifulSoup(r.text, 'lxml')
             
