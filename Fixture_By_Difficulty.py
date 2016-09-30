@@ -24,7 +24,7 @@ def switch_team_name(team):
         'Manchester United': 'Man United',
         'Stoke City': 'Stoke',
         'Swansea City': 'Swansea', 
-        'Tottenham Hotspur': 'Spurs',
+        'Tottenham Hotspur': 'Tottenham',
         'West Bromwich Albion': 'West Brom',
         'West Ham United': 'West Ham'
     }.get(team, team)
