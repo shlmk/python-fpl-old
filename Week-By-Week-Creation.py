@@ -20,7 +20,7 @@ def switch_team_name(team):
         'Manchester United': 'Man United',
         'Stoke City': 'Stoke',
         'Swansea City': 'Swansea', 
-        'Tottenham Hotspur': 'Spurs',
+        'Tottenham Hotspur': 'Tottenham',
         'West Bromwich Albion': 'West Brom',
         'West Ham United': 'West Ham'
     }.get(team, team)
@@ -50,7 +50,6 @@ for p in paragraphs:
             continue
         else: 
             teams = str_games.split(' vs. ')
-            print(teams[0])
             all_games[count][0] = teams[0].replace('\n', '')
             all_games[count][1] = teams[1].replace('\n', '')
             count += 1
@@ -58,6 +57,7 @@ for p in paragraphs:
 
 
 games_df = pd.DataFrame({'Home':all_games[:,0],'Away':all_games[:,1]})
+#From: https://stackoverflow.com/questions/27804729/python-groupby-error-unhashable-series-object
 games_df_updated = games_df.applymap(str).applymap(switch_team_name)
 
 teams = list(games_df_updated.Home.unique())
