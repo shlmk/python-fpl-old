@@ -111,11 +111,13 @@ def record_data(weeks):
                 raise IndexError('Week must be between 1 and 38')
             else: 
                 url = base_url + str(week_num)
-        
+                
             r = requests.get(url)
             soup = BeautifulSoup(r.text, 'lxml')
             
             process_week(soup, week_num)
+            
+record_data(list(range(1,7)))
 
 
           
